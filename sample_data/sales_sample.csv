@@ -1,0 +1,13 @@
+date,region,product,revenue,units_sold,refunds
+2026-01-01,West,Widget A,1200,40,2
+2026-01-08,West,Widget A,1260,42,1
+2026-01-15,West,Widget A,1375,45,2
+2026-01-22,West,Widget B,980,31,3
+2026-01-29,East,Widget A,1500,49,1
+2026-02-05,East,Widget B,1700,55,2
+2026-02-12,East,Widget B,1825,57,2
+2026-02-19,South,Widget C,840,29,4
+2026-02-26,South,Widget C,920,30,4
+2026-03-05,North,Widget A,2100,61,1
+2026-03-12,North,Widget B,2280,65,1
+2026-03-19,North,Widget B,2350,66,1

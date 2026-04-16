@@ -1,0 +1,42 @@
+version: "3.9"
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: flowpilot-backend
+    environment:
+      OPENAI_API_KEY: ""
+      OPENAI_BASE_URL: https://api.openai.com/v1
+      OPENAI_MODEL: gpt-4.1-mini
+      JWT_SECRET: replace-with-a-long-random-secret
+      ENCRYPTION_KEY: replace-with-a-different-secret
+      DATABASE_PATH: /app/data/flowpilot.db
+      UPLOAD_DIR: /app/data/uploads
+      LOGS_DIR: /app/data/logs
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:5173
+    volumes:
+      - backend_data:/app/data
+    ports:
+      - "8000:8000"
+    networks:
+      - flowpilot-net
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: flowpilot-frontend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - flowpilot-net
+
+volumes:
+  backend_data:
+
+networks:
+  flowpilot-net:
+    driver: bridge

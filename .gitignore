@@ -1,0 +1,30 @@
+# Environment files
+.env
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# Node
+node_modules/
+dist/
+build/
+.npm
+.eslintcache
+
+# Project specific
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/logs/*
+!backend/logs/.gitkeep
+backend/flowpilot.db
+
+# OS files
+.DS_Store
+Thumbs.db
