@@ -141,7 +141,20 @@ function Dashboard({ token, user, onLogout }) {
     setError("");
     try {
       const data = await apiRequest(`/api/v1/workflows/${runId}`, { token });
-      setRunData(data);
+      
+      setRunData({
+        ...data,
+        plan: data.plan ?? {
+          planner_source: data.run?.planner_source || "Rule-based",
+          summary: data.run?.final_response || "Loaded from workflow history.",
+          warnings: [],
+        },
+        final_output: data.final_output ?? {
+          note: data.run?.final_response || "No stored final output for this run.",
+        },
+      });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       setError(err.message || "Could not load workflow.");
     } finally {
@@ -168,7 +181,8 @@ function Dashboard({ token, user, onLogout }) {
         }),
       });
       setRunData(data);
-      refreshRuns();
+      await refreshRuns();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       const message = err.message || "Something broke, which is rude but unsurprising.";
       setError(message);
@@ -303,10 +317,10 @@ function Dashboard({ token, user, onLogout }) {
           {runData ? (
             <>
               <div className="summary-box">
-                <p><strong>Planner:</strong> {runData.plan.planner_source}</p>
-                <p><strong>Status:</strong> {runData.run.status}</p>
-                <p><strong>Plan summary:</strong> {runData.plan.summary}</p>
-                {runData.plan.warnings?.length ? (
+                <p><strong>Planner:</strong> {runData?.plan?.planner_source ?? runData?.run?.planner_source ?? "Rule-based"}</p>
+                <p><strong>Status:</strong> {runData?.run?.status ?? "unknown"}</p>
+                <p><strong>Plan summary:</strong> {runData?.plan?.summary ?? runData?.run?.final_response ?? "Workflow loaded."}</p>
+                {runData?.plan?.warnings?.length ? (
                   <ul>
                     {runData.plan.warnings.map((warning) => <li key={warning}>{warning}</li>)}
                   </ul>
@@ -314,36 +328,42 @@ function Dashboard({ token, user, onLogout }) {
               </div>
 
               <div className="trace-list">
-                {runData.steps.map((step) => (
-                  <div key={step.id} className={`trace-item ${step.status}`}>
-                    <div className="trace-head">
-                      <span>{step.step_number}. {step.title}</span>
-                      <span className={`status ${step.status}`}>{step.status}</span>
+                {(runData?.steps ?? []).length > 0 ? (
+                  (runData.steps ?? []).map((step) => (
+                    <div key={step.id} className={`trace-item ${step.status}`}>
+                      <div className="trace-head">
+                        <span>{step.step_number}. {step.title}</span>
+                        <span className={`status ${step.status}`}>{step.status}</span>
+                      </div>
+                      <p className="muted">{step.reason || `Tool: ${step.tool_name}`}</p>
+                      {step.error_message ? (
+                        <p className="error">{step.error_message}</p>
+                      ) : (
+                        <details>
+                          <summary>View raw step output</summary>
+                          <pre>{JSON.stringify(step.output_payload, null, 2)}</pre>
+                        </details>
+                      )}
                     </div>
-                    <p className="muted">{step.reason || `Tool: ${step.tool_name}`}</p>
-                    {step.error_message ? (
-                      <p className="error">{step.error_message}</p>
-                    ) : (
-                      <details>
-                        <summary>View raw step output</summary>
-                        <pre>{JSON.stringify(step.output_payload, null, 2)}</pre>
-                      </details>
-                    )}
+                  ))
+                ) : (
+                  <div className="empty-state">
+                    <p>This run was loaded, but no step details are available.</p>
                   </div>
-                ))}
+                )}
               </div>
 
               <div className="final-box">
                 <div className="final-head">
                   <h3>Final Result</h3>
-                  <div className="muted small">Run ID: {runData.run.id} · Status: {runData.run.status}</div>
+                  <div className="muted small">Run ID: {runData?.run?.id} · Status: {runData?.run?.status}</div>
                 </div>
                 <div className="final-response">
-                  {runData.final_output?.message || runData.final_output?.summary || "Workflow completed."}
+                  {runData?.final_output?.message || runData?.final_output?.summary || runData?.final_output?.note || "Workflow completed."}
                 </div>
                 <details>
                   <summary>View raw final output</summary>
-                  <pre>{JSON.stringify(runData.final_output, null, 2)}</pre>
+                  <pre>{JSON.stringify(runData?.final_output ?? {}, null, 2)}</pre>
                 </details>
               </div>
             </>

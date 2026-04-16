@@ -8,8 +8,8 @@ services:
       OPENAI_API_KEY: ""
       OPENAI_BASE_URL: https://api.openai.com/v1
       OPENAI_MODEL: gpt-4.1-mini
-      JWT_SECRET: replace-with-a-long-random-secret
-      ENCRYPTION_KEY: replace-with-a-different-secret
+      JWT_SECRET: sambhavi-sankalp
+      ENCRYPTION_KEY: sankalp-sambhavi
       DATABASE_PATH: /app/data/flowpilot.db
       UPLOAD_DIR: /app/data/uploads
       LOGS_DIR: /app/data/logs
